@@ -37,9 +37,9 @@ from matplotlib.backends.backend_tkagg import (
 )
 
 # own moduls
-import tr_moduls as trm
-from neurofeedback import record
-import process_functions as pfunc
+from moduls import tr_moduls as trm
+from moduls.neurofeedback import record
+from moduls import process_functions as pfunc
 
 import warnings
 warnings.filterwarnings("ignore")
@@ -467,7 +467,7 @@ class FivePage(tk.Frame):
         df_all_features = pfunc.pivot_channels(df_features)
         
         # Import SVR model and predict
-        regressor = pickle.load(open('svr_model.sav', 'rb'))  
+        regressor = pickle.load(open('models/svr_model.sav', 'rb'))  
         
         X_test = df_all_features.iloc[:,:df_all_features.shape[1]-4].values
         y_test = df_all_features.iloc[:,df_all_features.shape[1]-4].values
