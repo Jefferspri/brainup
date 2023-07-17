@@ -311,14 +311,14 @@ class FourthPage(tk.Frame):
         self.btn_result["state"] = "normal"
         print("Recording Started.")
         
-        inicio = time.time()
+        #inicio = time.time()
         counter = 1
         for i in range(len(images)):
             self.lbl_img.config(image = images[i])
             self.update()
             if i%4 == 0:
-                print(time.time()- inicio)
-                inicio = time.time()
+         #       print(time.time()- inicio)
+         #       inicio = time.time()
                 t_details["time"].append(datetime.datetime.now()) # transition start time
                 t_details["tag"].append(lst_random_images[counter])
                 counter += 1
@@ -579,7 +579,7 @@ def eeg_writer():
 
     # Set active EEG stream to inlet and apply time correction
     print("Start acquiring data")
-    inlet = StreamInlet(streams[0], max_chunklen=12)
+    inlet = StreamInlet(streams[0], max_chunklen=12, recover=True)
     eeg_time_correction = inlet.time_correction()
     
     # Get the stream info and description
@@ -596,7 +596,7 @@ def eeg_writer():
             if recording:
                 eeg_data, timestamp = inlet.pull_chunk(
                     timeout=1, max_samples=int(SHIFT_LENGTH * fs))
-                #print(eeg_data[0])
+                print(timestamp[0])
                 #print(time.time() - inicio)
                 #inicio = time.time()
                 all_raw_data['eeg'] = all_raw_data['eeg'] + eeg_data
@@ -607,6 +607,7 @@ def eeg_writer():
         except IndexError:
             # Sleep 5 sec.
             time.sleep(5)
+            
             print('Looking for an EEG stream...')
             streams = resolve_byprop('type', 'EEG', timeout=2)
             
@@ -615,7 +616,7 @@ def eeg_writer():
             else:
                 # Set active EEG stream to inlet and apply time correction
                 print("Start acquiring data")
-                inlet = StreamInlet(streams[0], max_chunklen=12)
+                inlet = StreamInlet(streams[0], max_chunklen=12, recover=True)
                 info = inlet.info()
                 fs = int(info.nominal_srate())
                      
@@ -656,7 +657,7 @@ mixer.music.stop()
 # Initialize threading and azync process
 try:
     th_eeg = threading.Thread(target = eeg_writer)
-    th_tk = threading.Thread(target = task_tk)
+    th_tk = threading.Thread(target = task_tk )
     th_tk.start()
     th_eeg.start()
 except:
