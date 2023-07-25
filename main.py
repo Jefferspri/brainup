@@ -25,7 +25,8 @@ try:
 except KeyboardInterrupt:
     adapter.Powered = False
     
-print("The End")
+    
+print("The End of all")
 
 
 

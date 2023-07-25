@@ -603,10 +603,16 @@ def eeg_writer():
                 all_raw_data['time'] = all_raw_data['time'] + timestamp
             else:
                 time.sleep(2)
+                if adapter.Powered == False:
+                    break
+
         
         except IndexError:
             # Sleep 5 sec.
             time.sleep(5)
+            # if down bluehoot
+            if adapter.Powered == False:
+                    break
             
             print('Looking for an EEG stream...')
             streams = resolve_byprop('type', 'EEG', timeout=2)
@@ -631,15 +637,27 @@ def on_closing():
     
 def task_tk():
     #global app
-    app = App()
-    #app.protocol("WM_DELETE_WINDOW", on_closing)
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    loop.run_until_complete(async_mainloop(app))
-       
+    try:
+        app = App()
+        #app.protocol("WM_DELETE_WINDOW", on_closing)
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        loop.run_until_complete(async_mainloop(app))
+    except:
+        adapter.Powered = False  # Shut down bluethoot adapter
+        print("End of TK")
+        
      
 # a little necesary time to don't interrupt eeg capture init         
 time.sleep(1)
+
+import pydbus
+# DBus object paths
+BLUEZ_SERVICE = 'org.bluez'
+ADAPTER_PATH = '/org/bluez/hci0'
+# setup dbus
+bus = pydbus.SystemBus()
+adapter = bus.get(BLUEZ_SERVICE, ADAPTER_PATH)
 
 # Initialize variables
 recording = False # EEG recording status
@@ -660,8 +678,7 @@ try:
     th_tk = threading.Thread(target = task_tk )
     th_tk.start()
     th_eeg.start()
-except:
+except :
     pass
 finally:
-    print("Closing")
     mixer.music.stop()
