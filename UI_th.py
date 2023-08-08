@@ -44,6 +44,110 @@ from moduls import process_functions as pfunc
 import warnings
 warnings.filterwarnings("ignore")
 
+class MuseConex(tk.Frame):
+
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        self.configure(bg='#fafafa')
+        
+        label_desc = tk.Label(self, text="Prueba de conexión - Muse",fg="#4d4e4f", bg='#fafafa', font=("Arial", 16))
+        label_desc.pack()
+        
+        self.btn_test = tk.Button(self, text="Graficar", font=("Arial", 14), command = async_handler(self.welch_garph))
+        self.btn_test.place(x=10, y=370)
+        self.btn_test_state = 0
+        
+        self.btn_test_stop = tk.Button(self, text="Stop", font=("Arial", 14), command = self.welch_garph_stop)
+        self.btn_test_stop.place(x=130, y=370)
+        self.btn_test_stop["state"] = "disabled"
+        
+        self.btn_channel = tk.Button(self, text="AF7", font=("Arial", 14), command=self.change_channel)
+        self.btn_channel.place(x=400, y=370)
+        self.bar_channel = 0
+        
+        self.btn_at_test = tk.Button(self, text="Test", font=("Arial", 14), command=lambda: controller.show_frame(FirstPage))
+        self.btn_at_test.place(x=720, y=370)
+        
+        # create a figure
+        self.fig, self.ax = plt.subplots(figsize=(8, 3))
+        self.fig.set_facecolor("#fafafa")
+        
+        # create FigureCanvasTkAgg object
+        self.graph = FigureCanvasTkAgg(self.fig, master=self)
+        self.graph.get_tk_widget().pack()
+        
+        self.ax.set_title('Espectro de potencia')
+        self.ax.set_xlabel('f (Hz)')
+        self.ax.set_ylabel('DSP (V**2/Hz)')
+        
+    def change_channel(self):
+        channels = ["AF7", "AF8", "TP9", "TP10"]
+        if self.bar_channel < 3:
+            self.bar_channel +=1
+        else:
+            self.bar_channel = 0
+            
+        if self.bar_channel == 3:
+            self.btn_channel["text"] = channels[0]
+        else:
+            self.btn_channel["text"] = channels[self.bar_channel+1]
+        
+        
+    def welch_garph_stop(self):
+        self.btn_test_state = 0
+        self.btn_test_stop["state"] = "disabled"
+        self.btn_test["state"] = "normal"
+        self.btn_at_test["state"] = "normal"
+        
+  
+    async def welch_garph(self):
+        global recording
+        global all_raw_data
+        recording = True
+        self.btn_test_state = 1
+        self.btn_test["state"] = "disabled"
+        self.btn_test_stop["state"] = "normal"
+        self.btn_at_test["state"] = "disabled"
+        channels = ["AF7", "AF8", "TP9", "TP10"]
+        await asyncio.sleep(3)
+        
+        while self.btn_test_state == 1:
+        
+            # EEG processing raw  - 'TP9', 'AF7', 'AF8', 'TP10'
+            raw_data = {}
+            raw_data['time'] = all_raw_data['time'][-768:]
+            raw_data['TP9'] = []
+            raw_data['AF7'] = []
+            raw_data['AF8'] = []
+            raw_data['TP10'] = []
+            
+            for raw in all_raw_data['eeg'][-768:]:
+                raw_data['TP9'].append(raw[0])
+                raw_data['AF7'].append(raw[1])
+                raw_data['AF8'].append(raw[2])
+                raw_data['TP10'].append(raw[3])
+                
+            raw = pd.DataFrame.from_dict(raw_data)
+            
+            raw["time"] = raw["time"].map(lambda x: datetime.datetime.fromtimestamp(x))
+                
+            fs = 256
+            (f, eeg) = signal.welch(raw[channels[self.bar_channel]], fs, nperseg = raw.shape[0])
+            
+            self.ax.cla()
+            self.ax.semilogy(f, eeg, color='#2354e8')
+            self.ax.set_title(channels[self.bar_channel]+' - '+'Espectro de potencia')
+            self.graph.draw()
+            
+            await asyncio.sleep(1)
+            
+        recording = False
+        self.btn_test_stop["state"] = "disabled"
+        self.btn_test["state"] = "normal"
+        self.btn_at_test["state"] = "normal"
+        
+                
+
 
 class FirstPage(tk.Frame):
 
@@ -62,6 +166,9 @@ class FirstPage(tk.Frame):
                              prueba. Finalmente, "Iniciar"" para hacer la prueba completa.""",
                              fg="#4d4e4f", bg='#fafafa', font=("Arial", 14))
         label_desc.place(x=2, y=5)
+        
+        btn_back = tk.Button(self, text="Atrás", font=("Arial", 14), command=lambda: controller.show_frame(MuseConex))
+        btn_back.place(x=10, y=300)
         
         Button = tk.Button(self, text="Continuar", font=("Arial", 14), command=lambda: controller.show_frame(SecondPage))
         Button.place(x=590, y=300)
@@ -542,12 +649,12 @@ class App(tk.Tk):
         window.grid_columnconfigure(0, minsize=800)
 
         self.frames = {}
-        for F in (FirstPage, SecondPage, ThirdPage, FourthPage, FivePage):
+        for F in (MuseConex, FirstPage, SecondPage, ThirdPage, FourthPage, FivePage):
             frame = F(window, self)
             self.frames[F] = frame
             frame.grid(row=0, column=0, sticky="nsew")
 
-        self.show_frame(FirstPage)
+        self.show_frame(MuseConex)
         
         
     def show_frame(self, page):
@@ -682,3 +789,4 @@ except :
     pass
 finally:
     mixer.music.stop()
+ 
