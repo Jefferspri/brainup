@@ -53,19 +53,19 @@ class MuseConex(tk.Frame):
         label_desc = tk.Label(self, text="Prueba de conexión - Muse",fg="#4d4e4f", bg='#fafafa', font=("Arial", 16))
         label_desc.pack()
         
-        self.btn_test = tk.Button(self, text="Graficar", font=("Arial", 14), command = async_handler(self.welch_garph))
+        self.btn_test = tk.Button(self, text="Graficar", font=("Arial", 14,),relief="flat", command = async_handler(self.welch_garph))
         self.btn_test.place(x=10, y=370)
         self.btn_test_state = 0
         
-        self.btn_test_stop = tk.Button(self, text="Stop", font=("Arial", 14), command = self.welch_garph_stop)
+        self.btn_test_stop = tk.Button(self, text="Stop", font=("Arial", 14), relief="flat",command = self.welch_garph_stop)
         self.btn_test_stop.place(x=130, y=370)
         self.btn_test_stop["state"] = "disabled"
         
-        self.btn_channel = tk.Button(self, text="AF7", font=("Arial", 14), command=self.change_channel)
+        self.btn_channel = tk.Button(self, text="AF8", bg='#fafafa',font=("Arial", 14), relief="flat",command=self.change_channel)
         self.btn_channel.place(x=400, y=370)
         self.bar_channel = 0
         
-        self.btn_at_test = tk.Button(self, text="Test", font=("Arial", 14), command=lambda: controller.show_frame(FirstPage))
+        self.btn_at_test = tk.Button(self, text="Test", font=("Arial", 14), relief="flat",command=lambda: controller.show_frame(FirstPage))
         self.btn_at_test.place(x=720, y=370)
         
         # create a figure
@@ -157,20 +157,20 @@ class FirstPage(tk.Frame):
         
         label_desc = tk.Label(self, text="""\n\n
                              Esta es una prueba de atención, prueba gradCPT.
-                             En ella observarás como pasan imágenes de forma gradual,
+                             En ella observarás la transición de imágenes de forma gradual,
                              imágenes de ciudades y montañas. Cada vez que veas la 
-                             imagen de una ciudad, debes presionar el botón azul.
+                             imagen de una ciudad, deberas presionar el botón azul.
                                              
-                             Presiona continuar para ver las imágenes que encontraras
+                             Presiona "Continuar" para ver las imágenes que encontraras
                              en la prueba. Luego, "Entrenar" para acostumbrarse a la 
-                             prueba. Finalmente, "Iniciar"" para hacer la prueba completa.""",
+                             prueba. Finalmente, "Test"" para hacer la prueba completa.""",
                              fg="#4d4e4f", bg='#fafafa', font=("Arial", 14))
         label_desc.place(x=2, y=5)
         
-        btn_back = tk.Button(self, text="Atrás", font=("Arial", 14), command=lambda: controller.show_frame(MuseConex))
-        btn_back.place(x=10, y=300)
+        btn_back = tk.Button(self, text="<<", font=("Arial", 14),relief="flat", bg='#fafafa',command=lambda: controller.show_frame(MuseConex))
+        btn_back.place(x=1, y=1)
         
-        Button = tk.Button(self, text="Continuar", font=("Arial", 14), command=lambda: controller.show_frame(SecondPage))
+        Button = tk.Button(self, text="Continuar", font=("Arial", 14),relief="flat", command=lambda: controller.show_frame(SecondPage))
         Button.place(x=590, y=300)
         
         self.bind('<Enter>', self.enter)
@@ -197,19 +197,19 @@ class SecondPage(tk.Frame):
         self.lbl_img.place(x=140,y=25)
         
         
-        Button = tk.Button(self, text="Atrás", font=("Arial", 14), command=lambda: controller.show_frame(FirstPage))
-        Button.place(x=612, y=7)
+        Button = tk.Button(self, text="<<", font=("Arial", 14),relief="flat", bg='#fafafa',command=lambda: controller.show_frame(FirstPage))
+        Button.place(x=1, y=1)
 
-        Button = tk.Button(self, text="<", font=("Arial", 14), command=self.back_img)
+        Button = tk.Button(self, text="<", bg='#fafafa', font=("Arial bold", 14), relief="flat",command=self.back_img)
         Button.place(x=600, y=100)
-        Button = tk.Button(self, text=">", font=("Arial", 14), command=self.next_img)
+        Button = tk.Button(self, text=">", bg='#fafafa', font=("Arial bold", 14), relief="flat",command=self.next_img)
         Button.place(x=650, y=100)
 
-        Button = tk.Button(self, text="Entrenar", font=("Arial", 14), command=lambda: controller.show_frame(ThirdPage))
+        Button = tk.Button(self, text="Entrenar", font=("Arial", 14), relief="flat",command=lambda: controller.show_frame(ThirdPage))
         Button.place(x=600, y=200)
         
-        Button = tk.Button(self, text="Iniciar", font=("Arial", 14), command=lambda: controller.show_frame(FourthPage))
-        Button.place(x=610, y=300)
+        Button = tk.Button(self, text="Test", font=("Arial", 14), relief="flat",command=lambda: controller.show_frame(FourthPage))
+        Button.place(x=615, y=300)
         
         self.bind('<Enter>', self.enter)
         
@@ -248,16 +248,16 @@ class ThirdPage(tk.Frame):
         self.lbl_img = tk.Label(self)
         self.lbl_img.place(x=140,y=25)
 
-        Button = tk.Button(self, text="Atrás", font=("Arial", 14), command=lambda: controller.show_frame(SecondPage))
-        Button.place(x=605, y=7)
+        Button = tk.Button(self, text="<<", font=("Arial", 14),relief="flat", bg='#fafafa',command=lambda: controller.show_frame(SecondPage))
+        Button.place(x=1, y=1)
         
-        Button = tk.Button(self, text="Iniciar", font=("Arial", 14), command=lambda: controller.show_frame(FourthPage))
-        Button.place(x=605, y=70)
+        Button = tk.Button(self, text="Test", font=("Arial", 14), relief="flat",command=lambda: controller.show_frame(FourthPage))
+        Button.place(x=610, y=15)
         
-        Button = tk.Button(self, text="O", font=("Arial", 14), command = async_handler(self.play_gif))
+        Button = tk.Button(self, text="O", font=("Arial", 14), bg='#fafafa',relief="flat",command = async_handler(self.play_gif))
         Button.place(x=620, y=150)
         
-        Button = tk.Button(self, text="            ", font=("Arial", 14), bg="#036ffc")
+        Button = tk.Button(self, text="            ", relief="flat",font=("Arial", 14), bg="#036ffc", height= 3)
         Button.place(x=600, y=300)
         
     def creador_de_lista_final(self, tam):
@@ -329,20 +329,17 @@ class FourthPage(tk.Frame):
         self.lbl_img = tk.Label(self)
         self.lbl_img.place(x=140,y=25)
 
-        btn_home = tk.Button(self, text="Home", font=("Arial", 14), command=lambda: controller.show_frame(FirstPage))
-        btn_home.place(x=605, y=7)
-
-        btn_back = tk.Button(self, text="Atrás", font=("Arial", 14), command=lambda: controller.show_frame(SecondPage))
-        btn_back.place(x=607, y=50)      
+        btn_back = tk.Button(self, text="<<", font=("Arial", 14),relief="flat", bg='#fafafa',command=lambda: controller.show_frame(SecondPage))
+        btn_back.place(x=1, y=1)      
         
-        self.btn_start = tk.Button(self, text="O", font=("Arial", 14), command = async_handler(self.play_gif)) #lambda:[self.play_gif, record]) # record 
+        self.btn_start = tk.Button(self, text="O", bg='#fafafa', font=("Arial", 14), relief="flat",command = async_handler(self.play_gif)) #lambda:[self.play_gif, record]) # record 
         self.btn_start.place(x=620, y=150)
         
-        self.btn_result = tk.Button(self, text="Resultados", font=("Arial", 12), command=lambda: controller.show_frame(FivePage))
+        self.btn_result = tk.Button(self, text="Resultados", relief="flat",font=("Arial", 12), command=lambda: controller.show_frame(FivePage))
         self.btn_result.place(x=590, y=200)
         self.btn_result["state"] = "disabled"
         
-        btn_click = tk.Button(self, text="            ", font=("Arial", 14), bg="#036ffc", command=self.take_time)
+        btn_click = tk.Button(self, text="            ", font=("Arial", 14), relief="flat",bg="#036ffc", height=3,command=self.take_time)
         btn_click.place(x=600, y=300)
         
         self.n = 1
@@ -464,10 +461,10 @@ class FivePage(tk.Frame):
         self.lbl_p_error = tk.Label(self, text="Error: ", bg='#fafafa',fg='#203ee6' , font=("Arial", 12))
         self.lbl_p_error.place(x=2, y=126)
 
-        btn_home = tk.Button(self, text="Home", font=("Arial", 14), command=lambda: controller.show_frame(FirstPage))
+        btn_home = tk.Button(self, text="Home", font=("Arial", 14), relief="flat",command=lambda: controller.show_frame(FirstPage))
         btn_home.place(x=350, y=5)
         
-        self.btn_result = tk.Button(self, text="Resultados", font=("Arial", 12), command=self.show_tr)
+        self.btn_result = tk.Button(self, text="Resultados", relief="flat",font=("Arial", 12), command=self.show_tr)
         self.btn_result.place(x=350, y=45)
         
         frame1 = tk.Frame(self, width=300, height=200, background="bisque")
