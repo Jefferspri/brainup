@@ -15,7 +15,7 @@ from random import shuffle
 from typing import List, Tuple
 import sys
 import threading
-from worker import create_worker,listen, sleep
+#from worker import create_worker,listen, sleep
 import asyncio
 import nest_asyncio
 nest_asyncio.apply()
@@ -28,6 +28,7 @@ import spkit as sp
 import pywt
 from sklearn import metrics
 import pickle
+import pydbus
 from matplotlib.ticker import AutoMinorLocator, FixedLocator
 from scipy.ndimage import gaussian_filter1d
 from matplotlib.figure import Figure
@@ -66,7 +67,7 @@ class MuseConex(tk.Frame):
         self.bar_channel = 0
         
         self.btn_at_test = tk.Button(self, text="Test", font=("Arial", 14), relief="flat",command=lambda: controller.show_frame(FirstPage))
-        self.btn_at_test.place(x=720, y=370)
+        self.btn_at_test.place(x=650, y=370)
         
         # create a figure
         self.fig, self.ax = plt.subplots(figsize=(8, 3))
@@ -189,7 +190,7 @@ class SecondPage(tk.Frame):
         
         self.img_num = 1
         imagia = Image.open("pics/images/c1.jpg").convert('L')
-        imagia = imagia.resize((350, 350), Image.Resampling.LANCZOS)
+        #imagia = imagia.resize((350, 350), Image.Resampling.LANCZOS)
         img = ImageTk.PhotoImage(imagia)
         
         self.lbl_img = tk.Label(self, image=img)
@@ -222,7 +223,7 @@ class SecondPage(tk.Frame):
         if self.img_num < 20:
             self.img_num += 1
             imagia = Image.open(f"pics/images/c{self.img_num}.jpg").convert('L')
-            imagia = imagia.resize((350, 350), Image.Resampling.LANCZOS)
+            #imagia = imagia.resize((350, 350), Image.Resampling.LANCZOS)
             img = ImageTk.PhotoImage(imagia)
             self.lbl_img.config(image=img)
             self.lbl_img.image = img 
@@ -232,7 +233,7 @@ class SecondPage(tk.Frame):
         if self.img_num > 1:
             self.img_num -= 1
             imagia = Image.open(f"pics/images/c{self.img_num}.jpg").convert('L')
-            imagia = imagia.resize((350, 350), Image.Resampling.LANCZOS)
+            #imagia = imagia.resize((350, 350), Image.Resampling.LANCZOS)
             img = ImageTk.PhotoImage(imagia)
             self.lbl_img.config(image=img)
             self.lbl_img.image = img
@@ -421,8 +422,8 @@ class FourthPage(tk.Frame):
             self.lbl_img.config(image = images[i])
             self.update()
             if i%4 == 0:
-         #       print(time.time()- inicio)
-         #       inicio = time.time()
+                #print(time.time()- inicio)
+                #inicio = time.time()
                 t_details["time"].append(datetime.datetime.now()) # transition start time
                 t_details["tag"].append(lst_random_images[counter])
                 counter += 1
@@ -699,10 +700,9 @@ def eeg_writer():
             # Obtain EEG data from the LSL stream
             if recording:
                 eeg_data, timestamp = inlet.pull_chunk(
-                    timeout=1, max_samples=int(SHIFT_LENGTH * fs))
-                print(timestamp[0])
-                #print(time.time() - inicio)
-                #inicio = time.time()
+                    timeout=1, max_samples=1)#int(SHIFT_LENGTH * fs))
+                #print(timestamp[0])
+
                 all_raw_data['eeg'] = all_raw_data['eeg'] + eeg_data
                 all_raw_data['time'] = all_raw_data['time'] + timestamp
             else:
@@ -716,7 +716,10 @@ def eeg_writer():
             time.sleep(5)
             # if down bluehoot
             if adapter.Powered == False:
-                    break
+                print(min(var_time))
+                print(np.mean(var_time))
+                print(max(var_time))
+                break
             
             print('Looking for an EEG stream...')
             streams = resolve_byprop('type', 'EEG', timeout=2)
@@ -740,7 +743,6 @@ def on_closing():
     
     
 def task_tk():
-    #global app
     try:
         app = App()
         #app.protocol("WM_DELETE_WINDOW", on_closing)
@@ -755,7 +757,6 @@ def task_tk():
 # a little necesary time to don't interrupt eeg capture init         
 time.sleep(1)
 
-import pydbus
 # DBus object paths
 BLUEZ_SERVICE = 'org.bluez'
 ADAPTER_PATH = '/org/bluez/hci0'
